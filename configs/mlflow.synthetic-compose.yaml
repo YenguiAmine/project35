@@ -1,0 +1,4 @@
+# URI for commands executed from inside the Compose network.
+tracking_uri: http://mlflow:5000
+experiment_name: project35-synthetic-development
+registered_model_name: project35-synthetic-churn

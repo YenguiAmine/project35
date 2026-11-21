@@ -1,0 +1,3 @@
+tracking_uri: http://127.0.0.1:5000
+experiment_name: project35-classification
+registered_model_name: project35-classifier

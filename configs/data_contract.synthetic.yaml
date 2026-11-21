@@ -1,0 +1,25 @@
+# User-approved synthetic-scope contract (2026-11-21); do not substitute for or describe as the course/business dataset.
+dataset_path: data/synthetic/b2b_churn_train.csv
+target_column: churn
+positive_class: 1
+f1_average: binary
+id_columns: []
+date_columns: []
+required_columns:
+  - tenure_months
+  - company_size
+  - monthly_recurring_revenue
+  - support_tickets_90d
+  - payment_delay_days_90d
+  - product_usage_ratio_30d
+  - cs_touches_90d
+  - contract_type
+  - industry
+  - region
+  - payment_method
+  - auto_renew
+  - churn
+test_size: 0.20
+validation_size: 0.20
+random_state: 35
+split_strategy: stratified

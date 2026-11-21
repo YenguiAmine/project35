@@ -1,0 +1,351 @@
+﻿{
+    "info":  {
+                 "name":  "Project 35 - API smoke client WP1-WP7",
+                 "_postman_id":  "bd1f9d43-8b76-4a35-a955-9a1b2d350035",
+                 "description":  "Client Postman HTTP pour les endpoints WP1 et WP4-WP6. Utiliser le profil Compose synthetic pour Django sur 8002. WP7 gate/retraining est un workflow CLI, audité dans MLflow et les rapports JSON. WP2/WP3 se vérifient via MLflow UI/CLI. Payloads synthétiques uniquement.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "variable":  [
+                     {
+                         "key":  "fastapi_base_url",
+                         "value":  "http://127.0.0.1:8000"
+                     },
+                     {
+                         "key":  "django_base_url",
+                         "value":  "http://127.0.0.1:8002"
+                     },
+                     {
+                         "key":  "mlflow_base_url",
+                         "value":  "http://127.0.0.1:5000"
+                     },
+                     {
+                         "key":  "sample_instance",
+                         "value":  "{\"tenure_months\":52,\"company_size\":20,\"monthly_recurring_revenue\":285.99,\"support_tickets_90d\":0,\"payment_delay_days_90d\":8,\"product_usage_ratio_30d\":0.188,\"cs_touches_90d\":0,\"contract_type\":\"monthly\",\"industry\":\"manufacturing\",\"region\":\"europe\",\"payment_method\":\"invoice\",\"auto_renew\":false}"
+                     },
+                     {
+                         "key":  "class_index",
+                         "value":  "1"
+                     },
+                     {
+                         "key":  "psi_window",
+                         "value":  "synthetic-postman-smoke"
+                     },
+                     {
+                         "key":  "psi_records",
+                         "value":  "[{\"tenure_months\":52,\"company_size\":20,\"monthly_recurring_revenue\":285.99,\"support_tickets_90d\":0,\"payment_delay_days_90d\":8,\"product_usage_ratio_30d\":0.188,\"cs_touches_90d\":0,\"contract_type\":\"monthly\",\"industry\":\"manufacturing\",\"region\":\"europe\",\"payment_method\":\"invoice\",\"auto_renew\":false},{\"tenure_months\":48,\"company_size\":36,\"monthly_recurring_revenue\":501.88,\"support_tickets_90d\":0,\"payment_delay_days_90d\":7,\"product_usage_ratio_30d\":0.7667,\"cs_touches_90d\":0,\"contract_type\":\"annual\",\"industry\":\"manufacturing\",\"region\":\"asia_pacific\",\"payment_method\":\"invoice\",\"auto_renew\":true}]"
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "WP1 — FastAPI",
+                     "item":  [
+                                  {
+                                      "name":  "Health",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{fastapi_base_url}}/health/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027health 200\u0027,()=\u003epm.response.to.have.status(200));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Contract metadata",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{fastapi_base_url}}/api/v1/data/contract/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027contract 200\u0027,()=\u003epm.response.to.have.status(200));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Validate synthetic sample only",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"target_column\": \"target\",\n  \"required_columns\": [\n    \"balance\",\n    \"segment\",\n    \"target\"\n  ],\n  \"records\": [\n    {\n      \"balance\": 1200.5,\n      \"segment\": \"A\",\n      \"target\": 0\n    },\n    {\n      \"balance\": 300,\n      \"segment\": \"B\",\n      \"target\": 1\n    }\n  ]\n}"
+                                                               },
+                                                      "url":  "{{fastapi_base_url}}/api/v1/data/validate/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027synthetic data validation 200\u0027,()=\u003epm.response.to.have.status(200));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "OpenAPI",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{fastapi_base_url}}/openapi.json"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027openapi 200\u0027,()=\u003epm.response.to.have.status(200));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "WP2-WP3 — MLflow",
+                     "item":  [
+                                  {
+                                      "name":  "Tracking UI reachability",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{mlflow_base_url}}/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027tracking UI 200\u0027,()=\u003epm.response.to.have.status(200));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "WP4 — Django REST",
+                     "item":  [
+                                  {
+                                      "name":  "Health",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{django_base_url}}/health/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027health responds\u0027,()=\u003epm.response.to.have.status(200));",
+                                                                                    "pm.test(\u0027health state explicit\u0027,()=\u003epm.expect(pm.response.json().status).to.be.oneOf([\u0027ok\u0027,\u0027degraded\u0027]));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Model info (requires champion)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{django_base_url}}/api/model-info/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027champion resolved\u0027,()=\u003epm.response.to.have.status(200));"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Prediction (requires champion; edit sample_instance)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"instances\":[{{sample_instance}}]}"
+                                                               },
+                                                      "url":  "{{django_base_url}}/api/predict/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027prediction 200\u0027,()=\u003epm.response.to.have.status(200));",
+                                                                                    "pm.test(\u0027model version and request id\u0027,()=\u003e{let x=pm.response.json();pm.expect(x.model_version).to.exist;pm.expect(x.request_id).to.exist;});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Django OpenAPI",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{django_base_url}}/api/schema/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027schema 200\u0027,()=\u003epm.response.to.have.status(200));",
+                                                                                    "pm.test(\u0027routes documented\u0027,()=\u003e{let p=pm.response.json().paths;pm.expect(p).to.have.property(\u0027/api/predict/\u0027);pm.expect(p).to.have.property(\u0027/api/explain/\u0027);});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "WP5 — SHAP (requires model and PROJECT35_SHAP_BACKGROUND)",
+                     "item":  [
+                                  {
+                                      "name":  "Local SHAP waterfall",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"instance\":{{sample_instance}},\"class_index\":{{class_index}}}"
+                                                               },
+                                                      "url":  "{{django_base_url}}/api/explain/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027local explanation 200\u0027,()=\u003epm.response.to.have.status(200));",
+                                                                                    "pm.test(\u0027SHAP data and audit metadata\u0027,()=\u003e{let x=pm.response.json();pm.expect(x.shap_values).to.be.an(\u0027object\u0027);pm.expect(x.waterfall_png_base64).to.be.a(\u0027string\u0027);pm.expect(x.reference_sha256).to.have.length(64);});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Global SHAP bar + beeswarm",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  "{{django_base_url}}/api/explain/global/?class_index={{class_index}}"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027global explanation 200\u0027,()=\u003epm.response.to.have.status(200));",
+                                                                                    "pm.test(\u0027bar and beeswarm\u0027,()=\u003e{let x=pm.response.json();pm.expect(x.mean_absolute_shap).to.be.an(\u0027object\u0027);pm.expect(x.summary_png_base64).to.be.a(\u0027string\u0027);pm.expect(x.beeswarm_png_base64).to.be.a(\u0027string\u0027);});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "WP6 - PSI monitoring (requires PROJECT35_PSI_REFERENCE)",
+                     "item":  [
+                                  {
+                                      "name":  "Compare current batch to frozen reference",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"current_window\":\"{{psi_window}}\",\"records\":{{psi_records}}}"
+                                                               },
+                                                      "url":  "{{django_base_url}}/api/monitoring/psi/"
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027PSI report returned\u0027,()=\u003epm.response.to.have.status(200));",
+                                                                                    "pm.test(\u0027report has status, hashes, feature PSI and bins\u0027,()=\u003e{let x=pm.response.json(), names=Object.keys(x.features);pm.expect(x.report_id).to.exist;pm.expect(x.reference_sha256).to.have.length(64);pm.expect(names.length).to.be.greaterThan(0);pm.expect(x.features[names[0]].bin_definition).to.exist;});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 }
+             ]
+}

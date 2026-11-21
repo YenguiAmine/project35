@@ -1,0 +1,12 @@
+# Copy to configs/data_contract.yaml and fill only from the official dataset/topic.
+dataset_path: data/raw/REPLACE_WITH_OFFICIAL_DATASET.csv
+target_column: REPLACE_WITH_OFFICIAL_TARGET
+positive_class: null # Required only for binary metrics; document the official meaning.
+f1_average: binary # Confirm class semantics and use macro/weighted for multiclass.
+id_columns: []
+date_columns: []
+required_columns: [] # Add official feature names after confirming the dataset.
+test_size: 0.20
+validation_size: 0.20
+random_state: 35
+split_strategy: stratified # Use chronological only when data and subject require it.

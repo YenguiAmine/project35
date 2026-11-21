@@ -1,0 +1,58 @@
+{
+  "dataset": "Project 35 synthetic B2B churn development dataset",
+  "synthetic": true,
+  "generator": "scripts/generate_synthetic_dataset.py",
+  "seed": 3501,
+  "target_column": "churn",
+  "positive_class": 1,
+  "populations_are_independently_generated": true,
+  "fit_population": {
+    "path": "data/synthetic/b2b_churn_train.csv",
+    "rows": 4000,
+    "class_counts": {
+      "0": 3165,
+      "1": 835
+    },
+    "sha256": "6167d68f99c93fb74c89f0cf3da6866d94d2bb1fc29723178e8f4249c49ebbec"
+  },
+  "gate_evaluation_population": {
+    "path": "data/synthetic/b2b_churn_gate_evaluation.csv",
+    "rows": 1000,
+    "class_counts": {
+      "0": 788,
+      "1": 212
+    },
+    "sha256": "7675b5d3e4e02c9c298af1bf630843118ea4cbbecb4e90a8278bd651598abda0"
+  },
+  "derived_demo_populations": [
+    {
+      "purpose": "SHAP reference; 100 deterministic rows sampled from the fit population, features only",
+      "path": "data/synthetic/b2b_churn_shap_reference.csv",
+      "rows": 100,
+      "sha256": "3e8d131777822d62e8e09e3bc54c0ae6cf7d20805433e359bf244455ea8e32c4"
+    },
+    {
+      "purpose": "PSI reference; fit population with target removed",
+      "path": "data/synthetic/b2b_churn_psi_reference.csv",
+      "rows": 4000,
+      "sha256": "ee87834969d7fe00f7902189e072df6278b7b9c3ff39c28fd13f5040b8485547"
+    },
+    {
+      "purpose": "PSI stable demo window; independent synthetic gate population, target removed",
+      "path": "data/synthetic/b2b_churn_psi_stable_batch.csv",
+      "rows": 1000,
+      "sha256": "2a6e2a79d1bac60c7b38ed3d53e9bc8caed0b0555b6dd6a1606592d0e0a29837"
+    },
+    {
+      "purpose": "PSI drift demo window; stable demo window with synthetic usage and region shift",
+      "path": "data/synthetic/b2b_churn_psi_drift_batch.csv",
+      "rows": 1000,
+      "sha256": "94dc223c34142bcca277c41d60ddf43c8efec99e9292c4c4f5a183b682983971"
+    }
+  ],
+  "limitations": [
+    "Generated data are illustrative and contain no real customer observations.",
+    "The target is simulated from a hand-authored probability rule.",
+    "Metrics and explanations from this data are software demonstrations only, not business evidence."
+  ]
+}

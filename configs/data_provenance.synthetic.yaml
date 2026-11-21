@@ -1,0 +1,19 @@
+dataset_name: Project 35 synthetic B2B churn development dataset
+source_url: project-generated://scripts/generate_synthetic_dataset.py
+source_version: generator-v1-seed-3501
+retrieved_on: 2026-11-20
+dataset_sha256: 6167d68f99c93fb74c89f0cf3da6866d94d2bb1fc29723178e8f4249c49ebbec
+license_name: project-generated synthetic development data
+license_url: not-applicable-no-third-party-data
+approval_status: approved
+approved_by: User explicitly approved use of the existing synthetic dataset and its synthetic-scope data contract/evaluation policy on 2026-11-21; not course or business-owner approval
+intended_use: synthetic-only technical development and evaluation across WP1-WP8, including candidate comparison, API, explainability, drift and gate demonstrations; no business or assignment-performance claims
+redistribution_allowed: true
+target_column: churn
+target_definition: Simulated binary customer churn label from the generator's probabilistic rule.
+positive_class: 1
+positive_class_definition: 1 indicates synthetic simulated churn; not an observed business outcome.
+split_policy: Independently generated training and holdout populations, each stratified after generation; no real customer/entity/time rows.
+sensitive_fields_reviewed: true
+excluded_fields_and_reason: []
+notes: User approval is limited to this generated dataset and synthetic contract/evaluation policy. Not the course dataset; do not use resulting metrics as business evidence or assignment results. The synthetic gate margins are illustrative and approved only for exercising the software gate.

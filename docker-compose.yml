@@ -1,0 +1,137 @@
+services:
+  mlflow:
+    build: .
+    command:
+      - mlflow
+      - server
+      - --backend-store-uri
+      - sqlite:////mlflow/mlflow.db
+      - --artifacts-destination
+      - /mlflow/artifacts
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+      - --allowed-hosts
+      - mlflow:5000,localhost:*,127.0.0.1:*,host.docker.internal:*
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  api:
+    build: .
+    command: uvicorn project35.api.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./configs:/app/configs:ro
+      - ./data:/app/data:ro
+    environment:
+      PROJECT35_ENV: development
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  django-api:
+    build: .
+    command: ["sh", "-c", "python django_app/manage.py migrate --noinput && python django_app/manage.py runserver 0.0.0.0:8001"]
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./django_app:/app/django_app
+      - ./data:/app/data:ro
+      - django_data:/app/django_data
+    environment:
+      DJANGO_DEBUG: "true"
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost,testserver,django-api"
+      DJANGO_DB_PATH: /app/django_data/db.sqlite3
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MLFLOW_REGISTERED_MODEL_NAME: "${MLFLOW_REGISTERED_MODEL_NAME:-project35-classifier}"
+      MLFLOW_MODEL_ALIAS: "${MLFLOW_MODEL_ALIAS:-champion}"
+      PROJECT35_SHAP_BACKGROUND: "${PROJECT35_SHAP_BACKGROUND:-/app/data/processed/shap_reference.csv}"
+      SHAP_MAX_BACKGROUND_ROWS: "${SHAP_MAX_BACKGROUND_ROWS:-40}"
+      SHAP_MAX_GLOBAL_ROWS: "${SHAP_MAX_GLOBAL_ROWS:-50}"
+      PROJECT35_PSI_REFERENCE: "${PROJECT35_PSI_REFERENCE:-/app/data/processed/psi_reference.csv}"
+      PSI_BINS: "${PSI_BINS:-10}"
+      PSI_EPSILON: "${PSI_EPSILON:-0.000001}"
+      PSI_WATCH_THRESHOLD: "${PSI_WATCH_THRESHOLD:-0.10}"
+      PSI_DRIFT_THRESHOLD: "${PSI_DRIFT_THRESHOLD:-0.25}"
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health/').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  synthetic-demo-api:
+    image: project_mlops-django-api
+    build: .
+    profiles: ["synthetic"]
+    command: ["sh", "-c", "python django_app/manage.py migrate --noinput && python django_app/manage.py runserver 0.0.0.0:8001"]
+    ports:
+      - "8002:8001"
+    volumes:
+      - ./django_app:/app/django_app
+      - ./data:/app/data:ro
+      - django_synthetic_data:/app/django_data
+    environment:
+      DJANGO_DEBUG: "true"
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost,testserver,synthetic-demo-api"
+      DJANGO_DB_PATH: /app/django_data/db.sqlite3
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MLFLOW_REGISTERED_MODEL_NAME: "project35-synthetic-churn"
+      MLFLOW_MODEL_ALIAS: "champion"
+      PROJECT35_SHAP_BACKGROUND: "/app/data/synthetic/b2b_churn_shap_reference.csv"
+      PROJECT35_PSI_REFERENCE: "/app/data/synthetic/b2b_churn_psi_reference.csv"
+      SHAP_MAX_BACKGROUND_ROWS: "20"
+      SHAP_MAX_GLOBAL_ROWS: "3"
+      SHAP_MAX_EVALS: "25"
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health/').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  challenger-workflow:
+    build: .
+    profiles: ["workflow"]
+    command:
+      - python
+      - scripts/run_challenger_workflow.py
+      - --data-config
+      - configs/data_contract.yaml
+      - --provenance
+      - configs/data_provenance.yaml
+      - --gate-config
+      - configs/gate.yaml
+      - --mlflow-config
+      - configs/mlflow.yaml
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./data:/app/data:ro
+      - ./reports:/app/reports
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    depends_on:
+      mlflow:
+        condition: service_healthy
+
+volumes:
+  mlflow_data:
+  django_data:
+  django_synthetic_data:

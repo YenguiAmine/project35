@@ -1,0 +1,26 @@
+# Local Django database and Python test/runtime files
+django_app/db.sqlite3
+*.sqlite3
+.env
+.venv/
+data/raw/*
+!data/raw/README.md
+data/processed/*
+!data/processed/README.md
+data/current/*
+!data/current/README.md
+data/holdout/*
+!data/holdout/README.md
+configs/data_contract.yaml
+configs/data_provenance.yaml
+configs/mlflow.yaml
+configs/gate.yaml
+reports/
+mlflow.db
+mlartifacts/
+mlruns/
+*.sqlite3-shm
+*.sqlite3-wal
+__pycache__/
+.pytest_cache/
+.coverage

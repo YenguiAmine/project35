@@ -1,0 +1,20 @@
+# Complete from the approved dataset source and course/encadrant decision.
+dataset_name: REPLACE_WITH_DATASET_NAME
+source_url: REPLACE_WITH_SOURCE_URL
+source_version: REPLACE_WITH_VERSION_OR_RELEASE_DATE
+retrieved_on: REPLACE_WITH_YYYY_MM_DD
+dataset_sha256: null # Fill with the hash from a pending preflight before approval.
+license_name: REPLACE_WITH_LICENSE
+license_url: REPLACE_WITH_LICENSE_URL
+approval_status: pending # pending | approved
+approved_by: REPLACE_WITH_COURSE_OR_DATA_OWNER
+intended_use: course_project_model_training_and_evaluation
+redistribution_allowed: false
+target_column: REPLACE_WITH_OFFICIAL_TARGET
+target_definition: REPLACE_WITH_BUSINESS_DEFINITION
+positive_class: null # State label and meaning if binary.
+positive_class_definition: REPLACE_WITH_POSITIVE_CLASS_MEANING
+split_policy: REPLACE_WITH_TIME_OR_ENTITY_LEAKAGE_POLICY
+sensitive_fields_reviewed: false
+excluded_fields_and_reason: []
+notes: REPLACE_WITH_LIMITATIONS_OR_CONTEXT

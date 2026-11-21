@@ -1,0 +1,11 @@
+# User-approved evaluation policy for synthetic technical demonstrations only (2026-11-21); margins are not business thresholds.
+model_name: project35-synthetic-churn
+evaluation_dataset_path: data/synthetic/b2b_churn_gate_evaluation.csv
+challenger_classifier: random_forest
+challenger_params:
+  n_estimators: 120
+  max_depth: 8
+  class_weight: balanced
+min_f1_improvement: 0.0
+min_roc_auc_improvement: 0.0
+report_dir: reports/synthetic-gates
